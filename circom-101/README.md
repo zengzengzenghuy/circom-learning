@@ -2,9 +2,13 @@
 
 Refer to repo `circom`
 
+![Circom & SnarkJs Flow](./Image/circuit%20flow.drawio.png)
+
 ## Installation
 ### Install circom
 **For Linux or MacOs**
+
+Install circom compiler(written in Rust)
 `curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh`
 
 `git clone https://github.com/iden3/circom.git`
@@ -38,15 +42,28 @@ Refer to repo `circom`
     c <== a * b;  
     }
 
+    // Compiler look for main component to compile circuit
+    component main = Multiplier2()
+
 
 ## Compile Circuit
 `circom multiplier2.circom --r1cs --wasm --sym --c`
 
+**Output will be four folders/files**
+
+1. `multiplier2_cpp` folder
+2. `multiplier_js` folder
+3. `multiplier2.r1cs` file
+4. `multiplier2.sym` file
+
 ## Compute witness
+Witness includes input, intermediate and output signals which shows that you are able to generate a proof based on these inputs. You will need input signals (in JSON form) to generate a witness. Only public input and output(public by default) is visible to public.
 ### Create `input.json` file
 insert the following json data into the file
 
 `{"a": 3, "b": 11}`
+
+By doing this, you are giving an example to the circuit and the circuit will generate witness that satisfy the circuit constrains(a bunch of equations).
 
 ### Compute witness with WebAssembly or with C++
 #### With WebAssembly
@@ -62,25 +79,38 @@ After that, run `./multiplier2 input.json witness.wtns`.
 
 
 ## Proving circuits
+zkSNARK need to `trusted setup` to generate a proof. Basically what **Powers of Tau** do is `trusted setup`.
 ### Powers of Tau
+
+Generate `pot12_0000.ptau`
+
 `snarkjs powersoftau new bn128 12 pot12_0000.ptau -v`
+
+Generate `pot12_0001.ptau`
 
 `snarkjs powersoftau contribute pot12_0000.ptau pot12_0001.ptau --name="First contribution" -v`
 
 ### Phase 2
+
+Generate `pot12_final.ptau`
+
 `snarkjs powersoftau prepare phase2 pot12_0001.ptau pot12_final.ptau -v`
 
+Generate `multiplier1_0000.zkey`
+
 `snarkjs groth16 setup multiplier2.r1cs pot12_final.ptau multiplier2_0000.zkey`
+
+Generate `multiplier2_0001.zkey`
 
 `snarkjs zkey export verificationkey multiplier2_0001.zkey verification_key.json`
 
 ### Generate a proof
 `snarkjs groth16 prove multiplier2_0001.zkey witness.wtns proof.json public.json`
 
-### Verifying a Proof
+### Verifying a Proof (Off chain)
 `snarkjs groth16 verify verification_key.json public.json proof.json`
 
-### Verifying from a Smart contract
+### Verifying from a Smart contract (On chain)
 This method is used to verify your proof on Ethereum smart contract.
 `snarkjs zkey export solidityverifier multiplier2_0001.zkey verifier.sol`
 

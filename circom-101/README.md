@@ -8,7 +8,7 @@ Flow according to [iden3 Circom Tutorial](https://iden3-docs.readthedocs.io/en/l
 
 Note: I'm unable to compile circuit to json file by running command `circom circuit.circom -o circuit.json` but can compile to other format like cpp, wasm. So I guess it's the problem of installing circom. There are two ways to install circom: 
 1. According to Iden3 Tutorial: `npm install -g circom`
-2. According to Circom Tutorial:  [Install circom](### Install circom)
+2. According to Circom Tutorial:  [Install circom](###install-circom)
 I've tried first one but couldn't compile to json file, so I used second one instead.
 
 This flow chart is simpler and you can get a general idea of what they are doing, so I demonstrate the flow from [iden3 Circom Tutorial](https://iden3-docs.readthedocs.io/en/latest/iden3_repos/circom/TUTORIAL.html), you get the idea.
